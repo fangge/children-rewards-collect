@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electronAPI", {
   // 孩子信息管理
   saveChildren: (children) => ipcRenderer.invoke("save-children", children),

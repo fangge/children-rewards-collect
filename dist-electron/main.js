@@ -10462,22 +10462,32 @@ ipcMain$1.handle("save-image", async (_event, { imageData, fileName }) => {
 });
 ipcMain$1.handle("select-image", async () => {
   if (!mainWindow) return { canceled: true };
-  const result = await dialog.showOpenDialog(mainWindow, {
-    properties: ["openFile"],
-    filters: [{ name: "Images", extensions: ["jpg", "jpeg", "png", "gif"] }]
-  });
-  if (result.canceled || result.filePaths.length === 0) {
-    return { canceled: true };
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ["openFile"],
+      filters: [{ name: "Images", extensions: ["jpg", "jpeg", "png", "gif"] }]
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+      return { canceled: true };
+    }
+    const filePath = result.filePaths[0];
+    const fileName = path$1.basename(filePath);
+    const targetPath = path$1.join(imagesDir, fileName);
+    await fs$1.promises.access(filePath, fs$1.constants.R_OK);
+    await fs$1.promises.access(imagesDir, fs$1.constants.W_OK);
+    await fs$1.promises.copyFile(filePath, targetPath);
+    return {
+      canceled: false,
+      filePath: targetPath,
+      fileName
+    };
+  } catch (error) {
+    console.error("处理图片失败:", error);
+    return {
+      canceled: false,
+      error: `处理图片失败: ${error.message || "未知错误"}`
+    };
   }
-  const filePath = result.filePaths[0];
-  const fileName = path$1.basename(filePath);
-  const targetPath = path$1.join(imagesDir, fileName);
-  fs$1.copyFileSync(filePath, targetPath);
-  return {
-    canceled: false,
-    filePath: targetPath,
-    fileName
-  };
 });
 ipcMain$1.handle("export-data", async () => {
   if (!mainWindow) return { success: false, error: "窗口未创建" };

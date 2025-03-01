@@ -74,15 +74,22 @@ const ChildrenManagement: React.FC<ChildrenManagementProps> = ({ children, onSav
   // 处理上传头像
   const handleSelectImage = async () => {
     try {
+      message.loading('正在选择图片...', 0.5);
       const result = await window.electronAPI.selectImage();
+      
+      if (result.error) {
+        message.error(result.error);
+        return;
+      }
       
       if (!result.canceled && result.filePath && result.fileName) {
         setAvatarUrl(result.filePath);
         setFileName(result.fileName);
+        message.success('图片选择成功');
       }
     } catch (error) {
       console.error('选择图片失败:', error);
-      message.error('选择图片失败');
+      message.error('选择图片失败，请重试');
     }
   };
 

@@ -106,30 +106,44 @@ ipcMain.handle('save-image', async (_event, { imageData, fileName }) => {
 
 // 选择图片
 ipcMain.handle('select-image', async () => {
-  if (!mainWindow) return { canceled: true }
+  if (!mainWindow) return { canceled: true };
   
-  const result = await dialog.showOpenDialog(mainWindow, {
-    properties: ['openFile'],
-    filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] }]
-  })
-  
-  if (result.canceled || result.filePaths.length === 0) {
-    return { canceled: true }
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile'],
+      filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] }]
+    });
+    
+    if (result.canceled || result.filePaths.length === 0) {
+      return { canceled: true };
+    }
+    
+    const filePath = result.filePaths[0];
+    const fileName = path.basename(filePath);
+    const targetPath = path.join(imagesDir, fileName);
+    
+    // 检查源文件是否存在且可读
+    await fs.promises.access(filePath, fs.constants.R_OK);
+    
+    // 检查目标目录是否可写
+    await fs.promises.access(imagesDir, fs.constants.W_OK);
+    
+    // 异步复制文件
+    await fs.promises.copyFile(filePath, targetPath);
+    
+    return {
+      canceled: false,
+      filePath: targetPath,
+      fileName
+    };
+  } catch (error) {
+    console.error('处理图片失败:', error);
+    return {
+      canceled: false,
+      error: `处理图片失败: ${error.message || '未知错误'}`
+    };
   }
-  
-  const filePath = result.filePaths[0]
-  const fileName = path.basename(filePath)
-  const targetPath = path.join(imagesDir, fileName)
-  
-  // 复制文件到应用数据目录
-  fs.copyFileSync(filePath, targetPath)
-  
-  return {
-    canceled: false,
-    filePath: targetPath,
-    fileName
-  }
-})
+});
 
 // 导出数据
 ipcMain.handle('export-data', async () => {

@@ -1,17 +1,17 @@
-import { contextBridge, ipcRenderer } from 'electron'
+const { contextBridge, ipcRenderer } = require('electron')
 
 // 暴露安全的API给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
   // 孩子信息管理
-  saveChildren: (children: any) => ipcRenderer.invoke('save-children', children),
+  saveChildren: (children) => ipcRenderer.invoke('save-children', children),
   getChildren: () => ipcRenderer.invoke('get-children'),
   
   // 奖项管理
-  saveRewards: (rewards: any) => ipcRenderer.invoke('save-rewards', rewards),
+  saveRewards: (rewards) => ipcRenderer.invoke('save-rewards', rewards),
   getRewards: () => ipcRenderer.invoke('get-rewards'),
   
   // 图片管理
-  saveImage: (imageData: string, fileName: string) => 
+  saveImage: (imageData, fileName) => 
     ipcRenderer.invoke('save-image', { imageData, fileName }),
   selectImage: () => ipcRenderer.invoke('select-image'),
   
