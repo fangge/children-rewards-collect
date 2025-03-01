@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* 覆盖Ant Design的一些默认样式 */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-header {
+  background: #1890ff;
+  padding: 0 24px;
+}
+
+.ant-layout-content {
+  background: #fff;
+}
+
+/* 图片预览样式 */
+.image-preview {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.image-preview:hover {
+  opacity: 0.8;
+}
+
+/* 表格样式优化 */
+.ant-table-wrapper {
+  margin-top: 16px;
+}
+
+/* 按钮样式 */
+.action-button {
+  margin-right: 8px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .ant-layout-header {
+    padding: 0 12px;
+  }
+  
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+}

@@ -1,0 +1,66 @@
+/* 应用整体样式 */
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* 头部样式 */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.app-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* 内容区域样式 */
+.content-container {
+  padding: 24px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* 表格样式 */
+.data-table {
+  margin-top: 16px;
+}
+
+/* 按钮样式 */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.action-button {
+  margin-left: 8px;
+}
+
+/* 图片预览样式 */
+.image-preview {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+/* 表单样式 */
+.form-container {
+  max-width: 600px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .action-buttons {
+    margin-top: 12px;
+  }
+}
