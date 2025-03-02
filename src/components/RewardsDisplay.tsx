@@ -196,8 +196,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
             children: (
               <Card
                 hoverable
-                style={{ marginBottom: 16 }}
-                bodyStyle={{ padding: 16 }}
+                style={{ marginBottom: 16,padding: 16}}
               >
                 <div
                   style={{ display: 'flex', flexDirection: 'column', gap: 16 }}

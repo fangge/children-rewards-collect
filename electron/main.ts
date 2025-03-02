@@ -8,11 +8,21 @@ import isDev from 'electron-is-dev';
 // 初始化存储
 const store = new ElectronStore({
   name: 'children-rewards-data',
-  fileExtension: 'json'
+  fileExtension: 'json',
+  cwd: app.getPath('userData') // 初始时使用默认的userData目录
 });
 
-// 获取用户数据目录下的images子目录
-const imagesDir = path.join(app.getPath('userData'), 'images');
+// 获取数据存储目录
+const getDataDir = () => {
+  const customDir = store.get('dataDir') as string | undefined;
+  return customDir || app.getPath('userData');
+};
+
+// 获取图片存储目录
+const getImagesDir = () => path.join(getDataDir(), 'images');
+
+// 获取当前图片目录
+let imagesDir = getImagesDir();
 
 // 在app ready事件中
 app.whenReady().then(() => {
@@ -21,6 +31,64 @@ app.whenReady().then(() => {
     recursive: true,
     mode: 0o755 // 设置目录权限为rwxr-xr-x
   });
+});
+
+// 设置数据目录
+ipcMain.handle('set-data-dir', async (_event, newPath: string) => {
+  try {
+    // 确保目录存在
+    await fs.promises.mkdir(newPath, { recursive: true });
+    
+    // 保存新路径
+    store.set('dataDir', newPath);
+    
+    // 更新图片目录
+    const newImagesDir = path.join(newPath, 'images');
+    await fs.promises.mkdir(newImagesDir, { recursive: true });
+    
+    // 如果旧目录存在且不同于新目录，复制所有文件
+    if (imagesDir !== newImagesDir && fs.existsSync(imagesDir)) {
+      const files = await fs.promises.readdir(imagesDir);
+      for (const file of files) {
+        const srcPath = path.join(imagesDir, file);
+        const destPath = path.join(newImagesDir, file);
+        await fs.promises.copyFile(srcPath, destPath);
+      }
+    }
+    
+    // 更新当前图片目录
+    imagesDir = newImagesDir;
+    
+    // 重新初始化store以使用新目录
+    const newStore = new ElectronStore({
+      name: 'children-rewards-data',
+      fileExtension: 'json',
+      cwd: newPath
+    });
+    
+    // 复制旧数据到新store
+    const oldData = {
+      children: store.get('children', []),
+      rewards: store.get('rewards', [])
+    };
+    
+    // 更新store引用
+    Object.assign(store, newStore);
+    
+    // 保存数据到新位置
+    store.set('children', oldData.children);
+    store.set('rewards', oldData.rewards);
+    
+    return { success: true };
+  } catch (error) {
+    console.error('设置数据目录失败:', error);
+    return { success: false, error: String(error) };
+  }
+});
+
+// 获取当前数据目录
+ipcMain.handle('get-data-dir', () => {
+  return getDataDir();
 });
 
 // 获取当前文件的目录
@@ -198,5 +266,27 @@ ipcMain.handle('import-data', async () => {
   } catch (error) {
     console.error('导入数据失败:', error);
     return { success: false, error: String(error) };
+  }
+});
+
+// 选择数据目录
+ipcMain.handle('select-data-dir', async () => {
+  if (!mainWindow) return { canceled: true };
+
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory', 'createDirectory'],
+      title: '选择数据存储目录'
+    });
+
+    if (result.canceled) return { canceled: true };
+
+    return {
+      canceled: false,
+      path: result.filePaths[0]
+    };
+  } catch (error) {
+    console.error('选择目录失败:', error);
+    return { error: String(error) };
   }
 });

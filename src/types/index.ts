@@ -41,6 +41,18 @@ declare global {
         error?: string;
       }>;
 
+      // 数据目录管理
+      setDataDir: (path: string) => Promise<{
+        success: boolean;
+        error?: string;
+      }>;
+      getDataDir: () => Promise<string>;
+      selectDataDir: () => Promise<{
+        canceled: boolean;
+        path?: string;
+        error?: string;
+      }>;
+
       // 数据导入导出
       exportData: () => Promise<{
         success: boolean;
