@@ -135,7 +135,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
 
   return (
     <div>
-      <div
+      <nav
         style={{
           marginBottom: 24,
           display: 'flex',
@@ -181,99 +181,106 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
             ]}
           />
         </Space>
-      </div>
-
-      {sortedRewards.length > 0 ? (
-        <Timeline
-          mode="left"
-          items={sortedRewards.map((reward) => ({
-            label: reward.date,
-            dot: (
-              <TrophyOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
-            ),
-            children: (
-              <Card hoverable style={{ marginBottom: 16, padding: 16 }}>
-                <div
-                  style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
-                >
+      </nav>
+      <section className="cont">
+        {sortedRewards.length > 0 ? (
+          <Timeline
+            mode="alternate"
+            items={sortedRewards.map((reward) => ({
+              label: reward.date,
+              dot: (
+                <TrophyOutlined
+                  style={{ fontSize: '16px', color: '#1890ff' }}
+                />
+              ),
+              children: (
+                <Card hoverable style={{ marginBottom: 16, padding: 16 }}>
                   <div
-                    style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 16
+                    }}
                   >
-                    {getChildAvatar(reward.childId) ? (
-                      <img
-                        src={getChildAvatar(reward.childId)}
-                        alt="头像"
-                        style={{ width: 40, height: 40, borderRadius: '50%' }}
-                      />
-                    ) : (
-                      <UserOutlined
-                        style={{
-                          fontSize: 24,
-                          padding: 8,
-                          background: '#f0f0f0',
-                          borderRadius: '50%'
-                        }}
-                      />
-                    )}
-                    <div>
-                      <div style={{ fontWeight: 'bold', fontSize: 16 }}>
-                        {getChildName(reward.childId)}
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                    >
+                      {getChildAvatar(reward.childId) ? (
+                        <img
+                          src={getChildAvatar(reward.childId)}
+                          alt="头像"
+                          style={{ width: 40, height: 40, borderRadius: '50%' }}
+                        />
+                      ) : (
+                        <UserOutlined
+                          style={{
+                            fontSize: 24,
+                            padding: 8,
+                            background: '#f0f0f0',
+                            borderRadius: '50%'
+                          }}
+                        />
+                      )}
+                      <div>
+                        <div style={{ fontWeight: 'bold', fontSize: 16 }}>
+                          {getChildName(reward.childId)}
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            color: '#888',
+                            fontSize: 14
+                          }}
+                        >
+                          <CalendarOutlined style={{ marginRight: 4 }} />{' '}
+                          {reward.date}
+                        </div>
                       </div>
+                    </div>
+
+                    <div>
                       <div
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          color: '#888',
-                          fontSize: 14
+                          marginBottom: 8
                         }}
                       >
-                        <CalendarOutlined style={{ marginRight: 4 }} />{' '}
-                        {reward.date}
+                        <ProjectOutlined
+                          style={{ marginRight: 8, color: '#1890ff' }}
+                        />
+                        <Text strong>{reward.activity}</Text>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 18,
+                          fontWeight: 'bold',
+                          color: '#1890ff',
+                          marginBottom: 12
+                        }}
+                      >
+                        {reward.name}
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: 8
-                      }}
-                    >
-                      <ProjectOutlined
-                        style={{ marginRight: 8, color: '#1890ff' }}
+                    {reward.image && (
+                      <Image
+                        src={reward.image}
+                        alt={reward.name}
+                        style={{ maxHeight: 300, objectFit: 'contain' }}
+                        className="image-preview"
                       />
-                      <Text strong>{reward.activity}</Text>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                        color: '#1890ff',
-                        marginBottom: 12
-                      }}
-                    >
-                      {reward.name}
-                    </div>
+                    )}
                   </div>
-
-                  {reward.image && (
-                    <Image
-                      src={reward.image}
-                      alt={reward.name}
-                      style={{ maxHeight: 300, objectFit: 'contain' }}
-                      className="image-preview"
-                    />
-                  )}
-                </div>
-              </Card>
-            )
-          }))}
-        />
-      ) : (
-        <Empty description="暂无奖项记录" style={{ marginTop: 60 }} />
-      )}
+                </Card>
+              )
+            }))}
+          />
+        ) : (
+          <Empty description="暂无奖项记录" style={{ marginTop: 60 }} />
+        )}
+      </section>
     </div>
   );
 };
