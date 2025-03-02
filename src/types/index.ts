@@ -30,15 +30,17 @@ declare global {
       getRewards: () => Promise<Reward[]>;
 
       // 图片管理
-      saveImage: (
+      saveImage: (obj: {
         imageData: string,
         fileName: string,
-        date: string
-      ) => Promise<{ success: boolean; path: string; error?: string }>;
+        date: string,
+        subDir?: string
+      }) => Promise<{ success: boolean; path: string; error?: string }>;
       selectImage: () => Promise<{
         canceled: boolean;
         filePath?: string;
         fileName?: string;
+        imageData?: string;
         error?: string;
       }>;
 
