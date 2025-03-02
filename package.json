@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite --config vite.config.ts",
-    "build": "tsc -b && vite build && electron-builder -- --mac --win",
+    "build": "tsc -b && vite build && electron-builder --mac --win",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -15,14 +15,12 @@
     "appId": "com.children.rewards",
     "productName": "儿童奖项收集",
     "directories": {
-      "output": "release",
-      "buildResources": "temp",
-      "app": "temp/app"
+      "output": "release"
     },
     "mac": {
       "target": "dmg",
-      "category": "public.app-category.utilities",
-      "artifactName": "${productName}-${version}-mac.${ext}"
+      "artifactName": "${productName}-${version}-mac.${ext}",
+      "mergeASARs": true
     },
     "win": {
       "target": "nsis",
@@ -32,9 +30,9 @@
       "category": "Utility",
       "target": []
     },
-    "prune": true,
-    "deletePackageScripts": true,
-    "asar": true
+    "publish": null,
+    "npmRebuild": false,
+    "generateUpdatesFilesForAllChannels": false
   },
   "dependencies": {
     "@types/uuid": "^10.0.0",
