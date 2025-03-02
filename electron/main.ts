@@ -6,7 +6,7 @@ import ElectronStore from 'electron-store';
 import isDev from 'electron-is-dev';
 
 // 初始化存储
-const store = new ElectronStore({
+let store = new ElectronStore({
   name: 'children-rewards-data',
   fileExtension: 'json',
   cwd: app.getPath('userData') // 初始时使用默认的userData目录
@@ -38,14 +38,14 @@ ipcMain.handle('set-data-dir', async (_event, newPath: string) => {
   try {
     // 确保目录存在
     await fs.promises.mkdir(newPath, { recursive: true });
-    
+
     // 保存新路径
     store.set('dataDir', newPath);
-    
+
     // 更新图片目录
     const newImagesDir = path.join(newPath, 'images');
     await fs.promises.mkdir(newImagesDir, { recursive: true });
-    
+
     // 如果旧目录存在且不同于新目录，复制所有文件
     if (imagesDir !== newImagesDir && fs.existsSync(imagesDir)) {
       const files = await fs.promises.readdir(imagesDir);
@@ -55,30 +55,30 @@ ipcMain.handle('set-data-dir', async (_event, newPath: string) => {
         await fs.promises.copyFile(srcPath, destPath);
       }
     }
-    
+
     // 更新当前图片目录
     imagesDir = newImagesDir;
-    
+
     // 重新初始化store以使用新目录
     const newStore = new ElectronStore({
       name: 'children-rewards-data',
       fileExtension: 'json',
       cwd: newPath
     });
-    
+
     // 复制旧数据到新store
     const oldData = {
       children: store.get('children', []),
       rewards: store.get('rewards', [])
     };
-    
-    // 更新store引用
-    Object.assign(store, newStore);
-    
+
+    // 完全替换store实例
+    store = newStore;
+
     // 保存数据到新位置
     store.set('children', oldData.children);
     store.set('rewards', oldData.rewards);
-    
+
     return { success: true };
   } catch (error) {
     console.error('设置数据目录失败:', error);
@@ -166,7 +166,7 @@ ipcMain.handle('save-image', async (_event, { imageData, fileName, date, subDir 
   try {
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
-    
+
     // 使用提供的 subDir 或者根据日期创建目录结构
     let targetDir;
     if (subDir) {
@@ -177,14 +177,14 @@ ipcMain.handle('save-image', async (_event, { imageData, fileName, date, subDir 
     } else {
       targetDir = imagesDir;
     }
-    
+
     // 确保目录存在
     await fs.promises.mkdir(targetDir, { recursive: true });
-    
+
     // 在目标目录下保存图片
     const imagePath = path.join(targetDir, fileName);
     await fs.promises.writeFile(imagePath, buffer);
-    
+
     return { success: true, path: imagePath };
   } catch (error) {
     console.error('保存图片失败:', error);
@@ -270,11 +270,88 @@ ipcMain.handle('import-data', async () => {
 
   try {
     const filePath = result.filePaths[0];
-    const fileData = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileData);
 
-    if (data.children) store.set('children', data.children);
-    if (data.rewards) store.set('rewards', data.rewards);
+    // 验证文件类型
+    if (!filePath.toLowerCase().endsWith('.json')) {
+      return { success: false, error: '只能导入JSON格式的文件' };
+    }
+
+    const fileData = fs.readFileSync(filePath, 'utf8');
+
+
+    let data;
+    try {
+      data = JSON.parse(fileData);
+
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      return { success: false, error: '文件内容不是有效的JSON格式' };
+    }
+
+    // 验证数据格式
+    if (!data || typeof data !== 'object') {
+      console.error('无效的数据格式: 不是对象');
+      return { success: false, error: '导入的数据格式不正确' };
+    }
+
+    if (!Array.isArray(data.children)) {
+      console.error('无效的children数据:', data.children);
+      return { success: false, error: '导入的children数据格式不正确' };
+    }
+
+    if (!Array.isArray(data.rewards)) {
+      console.error('无效的rewards数据:', data.rewards);
+      return { success: false, error: '导入的rewards数据格式不正确' };
+    }
+
+    // 验证数组内容
+    if (data.children.length === 0 && data.rewards.length === 0) {
+      console.warn('警告：导入的数据为空');
+    }
+
+    // 询问用户是否合并数据
+    const mergeChoice = await dialog.showMessageBox(mainWindow, {
+      type: 'question',
+      title: '导入选项',
+      message: '您想要如何处理现有数据？',
+      buttons: ['合并数据', '替换数据'],
+      defaultId: 0,
+      cancelId: 1,
+      detail: '合并数据：保留现有数据，并添加新数据\n替换数据：删除现有数据，仅保留导入的新数据'
+    });
+
+    const existingChildren = store.get('children', []) as any[];
+    const existingRewards = store.get('rewards', []) as any[];
+
+
+    if (mergeChoice.response === 0) {
+      // 合并数据
+      const mergedChildren = [...existingChildren, ...data.children.filter(newChild =>
+        !existingChildren.some(existing => existing.id === newChild.id)
+      )];
+
+      const mergedRewards = [...existingRewards, ...data.rewards.filter(newReward =>
+        !existingRewards.some(existing => existing.id === newReward.id)
+      )];
+
+
+      store.set('children', mergedChildren);
+      store.set('rewards', mergedRewards);
+    } else {
+      // 替换数据
+
+      store.set('children', data.children);
+      store.set('rewards', data.rewards);
+    }
+
+    // 验证数据是否成功保存
+    const savedChildren = store.get('children', []);
+    const savedRewards = store.get('rewards', []);
+
+
+    if (savedChildren.length === 0 && savedRewards.length === 0) {
+      console.warn('警告：保存后的数据为空');
+    }
 
     return { success: true };
   } catch (error) {

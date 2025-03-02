@@ -117,10 +117,7 @@ function App() {
       const result = await window.electronAPI.importData()
       if (result.success) {
         // 重新加载数据
-        const childrenData = await window.electronAPI.getChildren()
-        const rewardsData = await window.electronAPI.getRewards()
-        setChildren(childrenData)
-        setRewards(rewardsData)
+        await loadData()
         message.success('数据导入成功')
       } else if (!result.canceled) {
         message.error(`导入失败: ${result.error || '未知错误'}`)
