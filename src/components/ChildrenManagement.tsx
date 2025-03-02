@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Table, Button, Modal, Form, Input, DatePicker, Upload, message, Popconfirm } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker, message, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import { Child } from '../types';
 import dayjs from 'dayjs';
@@ -15,7 +15,7 @@ const ChildrenManagement: React.FC<ChildrenManagementProps> = ({ children, onSav
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [form] = Form.useForm();
   const [avatarUrl, setAvatarUrl] = useState<string>('');
-  const [fileName, setFileName] = useState<string>('');
+  // const [fileName, setFileName] = useState<string>('');
 
   // 打开添加/编辑模态框
   const showModal = (child?: Child) => {
@@ -82,9 +82,10 @@ const ChildrenManagement: React.FC<ChildrenManagementProps> = ({ children, onSav
         return;
       }
       
-      if (!result.canceled && result.filePath && result.fileName) {
-        setAvatarUrl(result.filePath);
-        setFileName(result.fileName);
+      if (!result.canceled && result.filePath) {
+        // 添加file://协议头
+        setAvatarUrl(`file://${result.filePath}`);
+        // setFileName(result.fileName || '');
         message.success('图片选择成功');
       }
     } catch (error) {

@@ -17,10 +17,19 @@
     "directories": {
       "output": "release"
     },
+    "linux": {
+      "category": "Utility",
+      "target": [
+        "deb",
+        "rpm",
+        "appImage"
+      ]
+    },
     "mac": {
       "target": [
         "dmg"
-      ]
+      ],
+      "category": "public.app-category.utilities"
     }
   },
   "dependencies": {

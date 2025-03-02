@@ -1,0 +1,17 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.children.rewards
+productName: 儿童奖项收集
+linux:
+  category: Utility
+  target:
+    - deb
+    - rpm
+    - appImage
+mac:
+  target:
+    - dmg
+  category: public.app-category.utilities
+files: []
+electronVersion: 34.3.0
