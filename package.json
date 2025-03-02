@@ -15,20 +15,19 @@
     "appId": "com.children.rewards",
     "productName": "儿童奖项收集",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "build"
     },
     "mac": {
       "target": "dmg",
+      "icon": "build/icons/mac/icon.icns",
       "artifactName": "${productName}-${version}-mac.${ext}",
       "mergeASARs": true
     },
     "win": {
       "target": "nsis",
+      "icon": "build/icons/win/icon.ico",
       "artifactName": "${productName}-${version}-win.${ext}"
-    },
-    "linux": {
-      "category": "Utility",
-      "target": []
     },
     "publish": null,
     "npmRebuild": false,
