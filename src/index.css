@@ -16,7 +16,7 @@ body {
 
 /* 覆盖Ant Design的一些默认样式 */
 .ant-layout {
-  min-height: 100vh;
+  height: 100%;
 }
 
 .ant-layout-header {
@@ -26,6 +26,7 @@ body {
 
 .ant-layout-content {
   background: #fff;
+  position: relative;
 }
 
 /* 图片预览样式 */

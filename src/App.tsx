@@ -19,7 +19,23 @@ function App() {
   const [currentDataDir, setCurrentDataDir] = useState('')
   
   const { token } = theme.useToken()
+  const handleExport = async () => {
+    const result = await window.electronAPI.exportWithImages();
+    if (result.success) {
+      message.success(`数据已导出至：${result.path}`);
+    }
+  };
   
+  const handleImport = async () => {
+    const { filePaths } = await dialog.showOpenDialog();
+    if (filePaths.length > 0) {
+      const result = await window.electronAPI.importWithImages(filePaths[0]);
+      if (result.success) {
+        message.success(`数据已导入到：${result.dataDir}`);
+        await window.electronAPI.setDataDir(result.dataDir);
+      }
+    }
+  };
   const loadData = async () => {
     try {
       setLoading(true)
