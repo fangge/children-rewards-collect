@@ -113,9 +113,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
     return child?.avatar;
   };
   // 安全的处理函数
-  const handleDateChange = (
-    dates: DateRangeType
-  ) => {
+  const handleDateChange = (dates: DateRangeType) => {
     if (dates && dates[0]?.isValid() && dates[1]?.isValid()) {
       // 明确转换为包含两个Dayjs的元组
       setDateRange([dates[0], dates[1]]);
@@ -194,10 +192,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
               <TrophyOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
             ),
             children: (
-              <Card
-                hoverable
-                style={{ marginBottom: 16,padding: 16}}
-              >
+              <Card hoverable style={{ marginBottom: 16, padding: 16 }}>
                 <div
                   style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
                 >
@@ -265,7 +260,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
 
                   {reward.image && (
                     <Image
-                      src={`file://${reward.image}`}
+                      src={reward.image}
                       alt={reward.name}
                       style={{ maxHeight: 300, objectFit: 'contain' }}
                       className="image-preview"

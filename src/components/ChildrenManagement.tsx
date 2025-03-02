@@ -82,11 +82,21 @@ const ChildrenManagement: React.FC<ChildrenManagementProps> = ({ children, onSav
         return;
       }
       
-      if (!result.canceled && result.filePath) {
-        // 添加file://协议头
-        setAvatarUrl(`file://${result.filePath}`);
-        // setFileName(result.fileName || '');
-        message.success('图片选择成功');
+      if (!result.canceled && result.imageData) {
+        // 保存头像图片
+        const saveResult = await window.electronAPI.saveImage({
+          imageData: result.imageData,
+          fileName: result.fileName || '',
+          date: dayjs().format('YYYY-MM-DD'),
+          subDir: 'avatars'
+        });
+
+        if (saveResult.success) {
+          setAvatarUrl(saveResult.path);
+          message.success('头像上传成功');
+        } else {
+          message.error('头像保存失败');
+        }
       }
     } catch (error) {
       console.error('选择图片失败:', error);
