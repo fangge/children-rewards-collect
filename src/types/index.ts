@@ -32,7 +32,8 @@ declare global {
       // 图片管理
       saveImage: (
         imageData: string,
-        fileName: string
+        fileName: string,
+        date: string
       ) => Promise<{ success: boolean; path: string; error?: string }>;
       selectImage: () => Promise<{
         canceled: boolean;

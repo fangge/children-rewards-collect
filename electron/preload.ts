@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getRewards: () => ipcRenderer.invoke('get-rewards'),
   
   // 图片管理
-  saveImage: (imageData, fileName) => 
-    ipcRenderer.invoke('save-image', { imageData, fileName }),
+  saveImage: (params: { imageData: string; fileName: string; date?: string; subDir?: string }) => 
+    ipcRenderer.invoke('save-image', params),
   selectImage: () => ipcRenderer.invoke('select-image'),
   
   // 数据目录管理

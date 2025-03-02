@@ -52,8 +52,8 @@ const RewardsManagement: React.FC<RewardsManagementProps> = ({
         return;
       }
 
-      if (!result.canceled && result.filePath) {
-        setImageUrl(`file://${result.filePath}`);
+      if (!result.canceled && result.imageData) {
+        setImageUrl(result.imageData);
         setFileName(result.fileName || '');
         message.success('图片选择成功');
       }
@@ -90,14 +90,18 @@ const RewardsManagement: React.FC<RewardsManagementProps> = ({
 
       // 如果有新上传的图片，保存图片
       let finalImageUrl = imageUrl;
-      let finalFileName = fileName;
+      const finalFileName = fileName;
 
       if (imageUrl && imageUrl.startsWith('data:')) {
         // 这是一个新上传的base64图片，需要保存
-        const saveResult = await window.electronAPI.saveImage(
-          imageUrl,
-          fileName
-        );
+        const date = values.date.format('YYYY-MM-DD');
+        const [year, month, day] = date.split('-');
+        const saveResult = await window.electronAPI.saveImage({
+          imageData: imageUrl,
+          fileName: fileName,
+          date,
+          subDir: `${year}/${month}/${day}`  // 添加子目录结构
+        });
         if (saveResult.success) {
           finalImageUrl = saveResult.path;
         } else {

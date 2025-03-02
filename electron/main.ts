@@ -162,12 +162,29 @@ ipcMain.handle('get-rewards', () => {
 });
 
 // 保存图片
-ipcMain.handle('save-image', async (_event, { imageData, fileName }) => {
+ipcMain.handle('save-image', async (_event, { imageData, fileName, date, subDir }) => {
   try {
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
-    const imagePath = path.join(imagesDir, fileName);
-    fs.writeFileSync(imagePath, buffer);
+    
+    // 使用提供的 subDir 或者根据日期创建目录结构
+    let targetDir;
+    if (subDir) {
+      targetDir = path.join(imagesDir, subDir);
+    } else if (date) {
+      const [year, month, day] = date.split('-');
+      targetDir = path.join(imagesDir, year, month, day);
+    } else {
+      targetDir = imagesDir;
+    }
+    
+    // 确保目录存在
+    await fs.promises.mkdir(targetDir, { recursive: true });
+    
+    // 在目标目录下保存图片
+    const imagePath = path.join(targetDir, fileName);
+    await fs.promises.writeFile(imagePath, buffer);
+    
     return { success: true, path: imagePath };
   } catch (error) {
     console.error('保存图片失败:', error);
@@ -187,24 +204,21 @@ ipcMain.handle('select-image', async () => {
 
     const sourcePath = result.filePaths[0];
     const fileName = path.basename(sourcePath);
-    const targetPath = path.join(imagesDir, fileName);
 
-    // 确保目标目录存在
-    await fs.promises.mkdir(imagesDir, { recursive: true });
-
-    // 复制文件并设置权限
-    await fs.promises.copyFile(sourcePath, targetPath);
-    await fs.promises.chmod(targetPath, 0o644); // 设置文件权限为rw-r--r--
+    // 读取文件内容并转换为base64
+    const imageBuffer = await fs.promises.readFile(sourcePath);
+    const base64Data = `data:image/${path.extname(sourcePath).slice(1)};base64,${imageBuffer.toString('base64')}`;
 
     return {
       canceled: false,
-      filePath: targetPath,
+      imageData: base64Data,
       fileName
     };
   } catch (error) {
     console.error('文件操作失败:', error);
     return {
-      error: error instanceof Error ? error.message : '未知错误'
+      error: error instanceof Error ? error.message : '未知错误',
+      canceled: true
     };
   }
 });
