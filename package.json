@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite --config vite.config.ts",
-    "build": "tsc -b && vite build && electron-builder --mac --win",
+    "build": "tsc -b && vite build && electron-builder --mac",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -23,11 +23,6 @@
       "icon": "build/icons/mac/icon.icns",
       "artifactName": "${productName}-${version}-mac.${ext}",
       "mergeASARs": true
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "build/icons/win/icon.ico",
-      "artifactName": "${productName}-${version}-win.${ext}"
     },
     "publish": null,
     "npmRebuild": false,

@@ -8,15 +8,17 @@ import {
   Spin,
   Typography,
   DatePicker,
-  Space
+  Space,
+  Tag
 } from 'antd';
 import {
   TrophyOutlined,
   CalendarOutlined,
   UserOutlined,
-  ProjectOutlined
+  ProjectOutlined,
+  BookOutlined
 } from '@ant-design/icons';
-import { Child, Reward } from '../types';
+import { Child, Reward, Subject } from '../types';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -24,6 +26,7 @@ dayjs.extend(isBetween);
 interface RewardsDisplayProps {
   children: Child[];
   rewards: Reward[];
+  subjects: Subject[];
   loading: boolean;
 }
 // 在组件顶部定义类型
@@ -35,17 +38,26 @@ const { RangePicker } = DatePicker;
 const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
   children,
   rewards,
+  subjects,
   loading
 }) => {
   const [selectedChild, setSelectedChild] = useState<string>('all');
   const [dateRange, setDateRange] = useState<DateRangeType>(null);
   const [ageRange, setAgeRange] = useState<[number, number]>([0, 18]);
+  const [selectedSubject, setSelectedSubject] = useState<string>('all');
+  
+  // 不再需要初始化默认学科数据，因为现在从App组件接收subjects
 
-  // 根据选择的孩子和日期范围筛选奖项
+  // 根据选择的孩子、日期范围和学科筛选奖项
   const filteredRewards = rewards.filter((reward) => {
     try {
       // 1. 筛选孩子
       if (selectedChild !== 'all' && reward.childId !== selectedChild) {
+        return false;
+      }
+      
+      // 1.5 筛选学科
+      if (selectedSubject !== 'all' && reward.subjectId !== selectedSubject) {
         return false;
       }
 
@@ -112,6 +124,13 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
     const child = children.find((c) => c.id === childId);
     return child?.avatar;
   };
+  
+  // 获取学科名称
+  const getSubjectName = (subjectId?: string) => {
+    if (!subjectId) return '未分类';
+    const subject = subjects.find((s) => s.id === subjectId);
+    return subject ? subject.name : '未知';
+  };
   // 安全的处理函数
   const handleDateChange = (dates: DateRangeType) => {
     if (dates && dates[0]?.isValid() && dates[1]?.isValid()) {
@@ -148,7 +167,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
         <Title level={4}>奖状展示墙</Title>
         <Space size="middle">
           <Select
-            style={{ width: 200 }}
+            style={{ width: 150 }}
             placeholder="选择孩子"
             value={selectedChild}
             onChange={(value) => setSelectedChild(value)}
@@ -160,12 +179,25 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
               }))
             ]}
           />
+          <Select
+            style={{ width: 150 }}
+            placeholder="选择学科"
+            value={selectedSubject}
+            onChange={(value) => setSelectedSubject(value)}
+            options={[
+              { value: 'all', label: '所有学科' },
+              ...subjects.map((subject) => ({
+                value: subject.id,
+                label: subject.name
+              }))
+            ]}
+          />
           <RangePicker
             onChange={handleDateChange}
             placeholder={['开始日期', '结束日期']}
           />
           <Select
-            style={{ width: 200 }}
+            style={{ width: 150 }}
             placeholder="年龄范围"
             value={`${ageRange[0]}-${ageRange[1]}岁`}
             onChange={(value) => {
@@ -261,6 +293,15 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
                         }}
                       >
                         {reward.name}
+                        {reward.subjectId && (
+                          <Tag 
+                            color="blue" 
+                            icon={<BookOutlined />} 
+                            style={{ marginLeft: 8 }}
+                          >
+                            {getSubjectName(reward.subjectId)}
+                          </Tag>
+                        )}
                       </div>
                     </div>
 

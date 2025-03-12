@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Layout, Menu, theme, message, Button, Modal, Input, Alert } from 'antd'
 import { UserOutlined, TrophyOutlined, ImportOutlined, ExportOutlined, CrownOutlined } from '@ant-design/icons'
 import './App.css'
-import { Child, Reward } from './types'
+import { Child, Reward, Subject } from './types'
+import { v4 as uuidv4 } from 'uuid'
 import ChildrenManagement from './components/ChildrenManagement'
 import RewardsManagement from './components/RewardsManagement'
 import RewardsDisplay from './components/RewardsDisplay'
@@ -14,6 +15,7 @@ function App() {
   const [activeKey, setActiveKey] = useState('children')
   const [children, setChildren] = useState<Child[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
+  const [subjects, setSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [isDataDirModalVisible, setIsDataDirModalVisible] = useState(false)
   const [currentDataDir, setCurrentDataDir] = useState('')
@@ -25,8 +27,14 @@ function App() {
       setLoading(true)
       const childrenData = await window.electronAPI.getChildren()
       const rewardsData = await window.electronAPI.getRewards()
+      const subjectsData = await window.electronAPI.getSubjects()
       setChildren(childrenData)
       setRewards(rewardsData)
+      
+      // 如果有保存的学科数据，则使用它，否则保持默认值
+      if (subjectsData && subjectsData.length > 0) {
+        setSubjects(subjectsData)
+      }
     } catch (error) {
       console.error('加载数据失败:', error)
       message.error('加载数据失败')
@@ -72,6 +80,19 @@ function App() {
     loadData()
   }, [])
   
+  // 初始化默认学科数据
+  useEffect(() => {
+    if (subjects.length === 0) {
+      // 设置默认学科
+      setSubjects([
+        { id: uuidv4(), name: '语文' },
+        { id: uuidv4(), name: '数学' },
+        { id: uuidv4(), name: '英语' },
+        { id: uuidv4(), name: '兴趣班' }
+      ])
+    }
+  }, [])
+  
   // 保存孩子信息
   const saveChildren = async (updatedChildren: Child[]) => {
     try {
@@ -89,6 +110,18 @@ function App() {
     try {
       await window.electronAPI.saveRewards(updatedRewards)
       setRewards(updatedRewards)
+      message.success('保存成功')
+    } catch (error) {
+      console.error('保存失败:', error)
+      message.error('保存失败')
+    }
+  }
+  
+  // 保存学科信息
+  const saveSubjects = async (updatedSubjects: Subject[]) => {
+    try {
+      await window.electronAPI.saveSubjects(updatedSubjects)
+      setSubjects(updatedSubjects)
       message.success('保存成功')
     } catch (error) {
       console.error('保存失败:', error)
@@ -147,9 +180,9 @@ function App() {
       case 'children':
         return <ChildrenManagement children={children} onSave={saveChildren} />
       case 'rewards':
-        return <RewardsManagement children={children} rewards={rewards} onSave={saveRewards} />
+        return <RewardsManagement children={children} rewards={rewards} subjects={subjects} onSave={saveRewards} onSaveSubjects={saveSubjects} />
       case 'display':
-        return <RewardsDisplay children={children} rewards={rewards} loading={loading} />
+        return <RewardsDisplay children={children} rewards={rewards} subjects={subjects} loading={loading} />
       default:
         return <div>选择一个选项</div>
     }

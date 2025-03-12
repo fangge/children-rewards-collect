@@ -10,6 +10,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveRewards: (rewards) => ipcRenderer.invoke('save-rewards', rewards),
   getRewards: () => ipcRenderer.invoke('get-rewards'),
   
+  // 学科管理
+  saveSubjects: (subjects) => ipcRenderer.invoke('save-subjects', subjects),
+  getSubjects: () => ipcRenderer.invoke('get-subjects'),
+  
   // 图片管理
   saveImage: (params: { imageData: string; fileName: string; date?: string; subDir?: string }) => 
     ipcRenderer.invoke('save-image', params),

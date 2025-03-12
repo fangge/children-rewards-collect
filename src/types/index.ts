@@ -6,6 +6,12 @@ export interface Child {
   avatar?: string;
 }
 
+// 学科信息接口
+export interface Subject {
+  id: string;
+  name: string;
+}
+
 // 奖项信息接口
 export interface Reward {
   id: string;
@@ -15,6 +21,7 @@ export interface Reward {
   name: string;
   image: string;
   fileName: string;
+  subjectId: string; // 关联的学科ID
 }
 
 // 声明全局Window接口，添加Electron API
@@ -28,6 +35,10 @@ declare global {
       // 奖项管理
       saveRewards: (rewards: Reward[]) => Promise<{ success: boolean }>;
       getRewards: () => Promise<Reward[]>;
+      
+      // 学科管理
+      saveSubjects: (subjects: Subject[]) => Promise<{ success: boolean }>;
+      getSubjects: () => Promise<Subject[]>;
 
       // 图片管理
       saveImage: (obj: {
