@@ -45,7 +45,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
   const [dateRange, setDateRange] = useState<DateRangeType>(null);
   const [ageRange, setAgeRange] = useState<[number, number]>([0, 18]);
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
-  
+
   // 不再需要初始化默认学科数据，因为现在从App组件接收subjects
 
   // 根据选择的孩子、日期范围和学科筛选奖项
@@ -55,7 +55,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
       if (selectedChild !== 'all' && reward.childId !== selectedChild) {
         return false;
       }
-      
+
       // 1.5 筛选学科
       if (selectedSubject !== 'all' && reward.subjectId !== selectedSubject) {
         return false;
@@ -124,7 +124,7 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
     const child = children.find((c) => c.id === childId);
     return child?.avatar;
   };
-  
+
   // 获取学科名称
   const getSubjectName = (subjectId?: string) => {
     if (!subjectId) return '未分类';
@@ -164,7 +164,9 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
           gap: 16
         }}
       >
-        <Title level={4}>奖状展示墙</Title>
+        <Title level={4} style={{ margin: 0 }}>
+          证书展示墙
+        </Title>
         <Space size="middle">
           <Select
             style={{ width: 150 }}
@@ -294,9 +296,9 @@ const RewardsDisplay: React.FC<RewardsDisplayProps> = ({
                       >
                         {reward.name}
                         {reward.subjectId && (
-                          <Tag 
-                            color="blue" 
-                            icon={<BookOutlined />} 
+                          <Tag
+                            color="blue"
+                            icon={<BookOutlined />}
                             style={{ marginLeft: 8 }}
                           >
                             {getSubjectName(reward.subjectId)}

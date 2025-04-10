@@ -218,7 +218,7 @@ function App() {
       </Modal>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>
-          儿童奖项收集
+          儿童成长记录册
         </div>
         <div style={{ marginLeft: 'auto' }}>
           <Button 
@@ -260,12 +260,12 @@ function App() {
               {
                 key: 'rewards',
                 icon: <TrophyOutlined />,
-                label: '奖项管理',
+                label: '证书管理',
               },
               {
                 key: 'display',
                 icon: <CrownOutlined />,
-                label: '奖状展示',
+                label: '证书展示',
               },
             ]}
             onSelect={({ key }) => setActiveKey(key)}

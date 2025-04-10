@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveChildren: (children) => ipcRenderer.invoke('save-children', children),
   getChildren: () => ipcRenderer.invoke('get-children'),
   
-  // 奖项管理
+  // 证书管理
   saveRewards: (rewards) => ipcRenderer.invoke('save-rewards', rewards),
   getRewards: () => ipcRenderer.invoke('get-rewards'),
   

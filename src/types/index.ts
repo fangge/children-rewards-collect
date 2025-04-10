@@ -4,6 +4,8 @@ export interface Child {
   name: string;
   birthDate: string;
   avatar?: string;
+  gender:string;
+  hobbies?: string[];
 }
 
 // 学科信息接口
@@ -32,7 +34,7 @@ declare global {
       saveChildren: (children: Child[]) => Promise<{ success: boolean }>;
       getChildren: () => Promise<Child[]>;
 
-      // 奖项管理
+      // 证书管理
       saveRewards: (rewards: Reward[]) => Promise<{ success: boolean }>;
       getRewards: () => Promise<Reward[]>;
       

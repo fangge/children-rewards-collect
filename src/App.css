@@ -59,13 +59,14 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .action-buttons {
     margin-top: 12px;
   }
 }
-.cont{
-  height:calc(100vh - 262px);
+.cont {
+  height: calc(100vh - 190px);
+  padding-top: 10px;
   overflow-x: hidden;
   overflow-y: auto;
 }
