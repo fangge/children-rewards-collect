@@ -14,11 +14,38 @@
     "preview": "vite preview"
   },
   "build": {
-    "appId": "com.children.rewards",
     "productName": "儿童成长记录册",
     "directories": {
       "output": "release",
       "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons/win/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "儿童成长记录册",
+      "installerIcon": "build/icons/win/icon.ico",
+      "uninstallerIcon": "build/icons/win/icon.ico",
+      "installerHeaderIcon": "build/icons/win/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "mac": {
       "target": "dmg",
@@ -26,14 +53,10 @@
       "artifactName": "${productName}-${version}-mac.${ext}",
       "mergeASARs": true
     },
-    "win": {
-      "target": ["nsis", "portable"],
-      "icon": "build/icons/win/icon.ico",
-      "artifactName": "${productName}-${version}-win.${ext}"
-    },
     "publish": null,
     "npmRebuild": false,
-    "generateUpdatesFilesForAllChannels": false
+    "generateUpdatesFilesForAllChannels": false,
+    "asar": true
   },
   "dependencies": {
     "@types/adm-zip": "^0.5.7",
